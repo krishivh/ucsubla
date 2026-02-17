@@ -36,9 +36,9 @@ export default function BookmarksPage() {
       <div className="h-[52px]" style={{ marginTop: 'env(safe-area-inset-top)' }} />
 
       {/* Content */}
-      <main className="px-5">
+      <main className="px-5 pt-4">
         {bookmarkedListings.length > 0 ? (
-          <div className="space-y-4">
+          <div className="space-y-3">
             {bookmarkedListings.map((listing) => (
               <ListingCard
                 key={listing.id}

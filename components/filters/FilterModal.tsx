@@ -337,7 +337,7 @@ export default function FilterModal({
         <div className="fixed bottom-0 left-0 right-0 p-6 pb-safe app-container">
           <button
             onClick={handleApply}
-            className="w-full btn-primary py-4 rounded-xl text-h3 shadow-lg"
+            className="w-full btn-primary py-4 rounded-xl text-h3 shadow-elevated"
           >
             Apply Filters ({resultCount})
           </button>

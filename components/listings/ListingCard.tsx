@@ -23,8 +23,8 @@ export default function ListingCard({ listing, isBookmarked, onBookmarkToggle }:
   };
 
   return (
-    <Link href={`/listing/${listing.id}`} className="block pb-3.5">
-      <div className="card shadow-minimal">
+    <Link href={`/listing/${listing.id}`} className="block">
+      <div className="card shadow-minimal hover:shadow-card transition-shadow duration-200">
         {/* Image */}
         <div className="relative h-56 bg-gray-200 overflow-hidden">
           {!imageError ? (

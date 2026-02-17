@@ -177,7 +177,7 @@ export default function MessagesPage() {
                 className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${
                   isSentByMe
                     ? 'bg-uclaBlue text-white'
-                    : 'bg-gray-100 text-darkSlate'
+                    : 'bg-gray-200 text-darkSlate'
                 }`}
               >
                 <p className="text-body">{message.text}</p>
@@ -198,7 +198,7 @@ export default function MessagesPage() {
       </div>
 
       {/* Message Input - Fixed above nav bar */}
-      <div className="fixed bottom-20 left-0 right-0 border-t border-borderLight px-6 py-3 bg-background app-container z-30">
+      <div className="fixed bottom-20 left-0 right-0 px-6 py-3 bg-background app-container z-30">
         <div className="flex items-center gap-2">
           <input
             type="text"
@@ -206,7 +206,7 @@ export default function MessagesPage() {
             onChange={(e) => setMessageText(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
             placeholder="Type a message..."
-            className="flex-1 bg-white border border-border rounded-full px-4 py-2.5 text-body text-darkSlate placeholder:text-lightSlate focus:outline-none focus:ring-2 focus:ring-uclaBlue"
+            className="flex-1 bg-white border border-border rounded-full px-4 py-2.5 text-body text-darkSlate placeholder:text-lightSlate focus:outline-none focus:ring-0 focus:border-uclaBlue"
           />
           <button
             onClick={handleSendMessage}

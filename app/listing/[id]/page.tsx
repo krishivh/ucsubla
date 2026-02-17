@@ -194,7 +194,7 @@ export default function ListingDetailsPage() {
       <div className="fixed bottom-20 left-0 right-0 px-6 py-2 app-container">
         <button
           onClick={() => router.push('/messages')}
-          className="w-full btn-primary py-4 rounded-xl text-h3 flex items-center justify-center gap-2"
+          className="w-full btn-primary py-4 rounded-xl text-h3 shadow-elevated flex items-center justify-center gap-2"
         >
           <Icon name="message" size={20} className="text-white" />
           <span>Message</span>

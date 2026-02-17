@@ -51,18 +51,18 @@ export default function Header({ onFilterClick, onSearchChange, hideSearch = fal
               placeholder="Search streets (e.g. Kelton)..."
               value={searchQuery}
               onChange={handleSearchChange}
-              className="w-full bg-white border border-border rounded-lg pl-10 pr-4 py-2.5 text-body text-slateGray placeholder:text-lightSlate focus:outline-none focus:ring-2 focus:ring-uclaBlue"
+              className="w-full bg-white border border-border rounded-lg pl-9 pr-4 py-2 text-body text-slateGray placeholder:text-lightSlate focus:outline-none focus:ring-2 focus:ring-uclaBlue"
             />
             <div className="absolute left-3 top-1/2 -translate-y-1/2">
-              <Icon name="search" size={24} className="text-lightSlate" />
+              <Icon name="search" size={20} className="text-lightSlate" strokeWidth={2} />
             </div>
           </div>
 
           <button
             onClick={onFilterClick}
-            className="bg-white border border-border rounded-lg p-[10px] hover:bg-gray-50 transition-colors"
+            className="bg-white border border-border rounded-lg p-2 hover:bg-gray-50 transition-colors"
           >
-            <Icon name="slider.horizontal.3" size={24} className="text-slateGray" strokeWidth={2.5} />
+            <Icon name="slider.horizontal.3" size={20} className="text-slateGray" strokeWidth={2} />
           </button>
         </div>
       )}

@@ -721,7 +721,7 @@ export default function CreateListingPage() {
         <button
           onClick={handleSubmit}
           disabled={isSubmitting || !isFormValid()}
-          className="w-full btn-primary py-4 rounded-xl text-h3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="w-full btn-primary py-4 rounded-xl text-h3 shadow-elevated disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2"
         >
           {isSubmitting ? (
             <>

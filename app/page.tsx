@@ -89,14 +89,14 @@ export default function Home() {
       {/* Spacer for fixed header */}
       <div className="h-[100px] safe-area-top" />
 
-      <main className="px-5">
+      <main className="px-5 pt-4">
         {/* Section heading */}
-        <h2 className="text-h2 text-darkSlate mb-2">
+        <h2 className="text-h2 text-darkSlate mb-4">
           Newest listings near campus
         </h2>
 
         {/* Listings grid */}
-        <div className="space-y-4">
+        <div className="space-y-3">
           {displayedListings.length > 0 ? (
             displayedListings.map(listing => (
               <ListingCard

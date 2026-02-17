@@ -117,8 +117,8 @@ export default function FilterModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 overflow-y-auto">
-      <div className="min-h-screen bg-background pb-28 safe-area-top">
+    <div className="fixed inset-0 bg-background z-[1001] overflow-y-auto">
+      <div className="min-h-screen pb-28">
         {/* Header */}
         <div className="sticky top-0 bg-[#F8FAFC] border-b-[1.5px] border-[#E2E8F0] z-10 safe-area-top">
           <div className="flex items-center justify-between px-5 py-3">
@@ -200,6 +200,7 @@ export default function FilterModal({
           <RangeSlider
             min={0.1}
             max={4}
+            step={0.1}
             value={filters.maxDistance}
             onChange={(maxDistance) => setFilters({ ...filters, maxDistance })}
             formatValue={(v) => `Within ${v.toFixed(1)} miles`}
@@ -333,10 +334,10 @@ export default function FilterModal({
         </div>
 
         {/* Apply Button (Fixed) */}
-        <div className="fixed bottom-0 left-0 right-0 bg-background border-t border-borderLight p-6 pb-safe">
+        <div className="fixed bottom-0 left-0 right-0 p-6 pb-safe app-container">
           <button
             onClick={handleApply}
-            className="w-full btn-primary py-4 rounded-xl text-h3"
+            className="w-full btn-primary py-4 rounded-xl text-h3 shadow-lg"
           >
             Apply Filters ({resultCount})
           </button>

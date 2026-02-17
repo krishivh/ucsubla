@@ -1,0 +1,72 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import Icon from '../common/Icon';
+
+interface HeaderProps {
+  onFilterClick?: () => void;
+  onSearchChange?: (query: string) => void;
+  hideSearch?: boolean;
+}
+
+export default function Header({ onFilterClick, onSearchChange, hideSearch = false }: HeaderProps) {
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+    if (onSearchChange) {
+      onSearchChange(value);
+    }
+  };
+
+  return (
+    <header className="blurHeaderLarge app-container">
+      <div className="blurHeaderLargeContent">
+        {/* Logo and List button */}
+        <div className="flex items-center justify-between mb-1.5">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="bg-uclaBlue rounded-lg p-1.5">
+            <Icon name="graduationcap.fill" size={20} className="text-white" />
+          </div>
+          <h1 className="text-h1 text-uclaBlue">UCSubLA</h1>
+        </Link>
+
+        <Link
+          href="/listing/new"
+          className="bg-uclaBlue text-white rounded-[18px] px-2.5 py-1.5 flex items-center gap-1 text-small font-medium hover:bg-[#25579e] transition-colors"
+        >
+          <Icon name="plus" size={16} className="text-white" />
+          <span>List</span>
+        </Link>
+      </div>
+
+      {/* Search bar and filter button */}
+      {!hideSearch && (
+        <div className="flex items-center gap-2">
+          <div className="flex-1 relative">
+            <input
+              type="text"
+              placeholder="Search streets (e.g. Kelton)..."
+              value={searchQuery}
+              onChange={handleSearchChange}
+              className="w-full bg-white border border-border rounded-lg pl-10 pr-4 py-2.5 text-body text-slateGray placeholder:text-lightSlate focus:outline-none focus:ring-2 focus:ring-uclaBlue"
+            />
+            <div className="absolute left-3 top-1/2 -translate-y-1/2">
+              <Icon name="search" size={24} className="text-lightSlate" />
+            </div>
+          </div>
+
+          <button
+            onClick={onFilterClick}
+            className="bg-white border border-border rounded-lg p-[10px] hover:bg-gray-50 transition-colors"
+          >
+            <Icon name="slider.horizontal.3" size={24} className="text-slateGray" strokeWidth={2.5} />
+          </button>
+        </div>
+      )}
+      </div>
+    </header>
+  );
+}

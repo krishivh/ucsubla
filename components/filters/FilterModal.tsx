@@ -117,7 +117,7 @@ export default function FilterModal({
   };
 
   return (
-    <div className="fixed inset-0 bg-background z-[1001] overflow-y-auto">
+    <div className="fixed inset-0 bg-background z-[1001] overflow-y-auto animate-slideUp">
       <div className="min-h-screen pb-28">
         {/* Header */}
         <div className="sticky top-0 bg-[#F8FAFC] border-b-[1.5px] border-[#E2E8F0] z-10 safe-area-top">

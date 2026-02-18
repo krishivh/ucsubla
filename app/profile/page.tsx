@@ -30,7 +30,7 @@ export default function ProfilePage() {
       <div className="h-[52px]" style={{ marginTop: 'env(safe-area-inset-top)' }} />
 
       {/* Profile Info */}
-      <div className="px-5 mb-6">
+      <div className="px-5 pt-4 mb-6">
         <div className="card p-6">
           <div className="flex items-center gap-4 mb-4">
             {/* Avatar */}

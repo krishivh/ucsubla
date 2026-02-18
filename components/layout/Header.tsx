@@ -35,7 +35,7 @@ export default function Header({ onFilterClick, onSearchChange, hideSearch = fal
 
         <Link
           href="/listing/new"
-          className="bg-uclaBlue text-white rounded-[18px] px-2.5 py-1.5 flex items-center gap-1 text-small font-medium hover:bg-[#25579e] transition-colors"
+          className="bg-uclaBlue text-white rounded-[18px] px-2.5 py-1.5 flex items-center gap-1 text-small font-medium hover:bg-[#25579e] active:scale-95 transition-all duration-150"
         >
           <Icon name="plus" size={16} className="text-white" />
           <span>List</span>

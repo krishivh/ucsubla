@@ -39,7 +39,7 @@ export default function CreateListingPage() {
       laundryInUnit: false,
       laundryOnSite: false,
       balcony: false,
-      parking: null as ParkingType,
+      parking: null as ParkingType | null,
       fitnessCenter: false,
       pool: false,
       hotTub: false,

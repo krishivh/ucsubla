@@ -721,11 +721,15 @@ export default function CreateListingPage() {
         <button
           onClick={handleSubmit}
           disabled={isSubmitting || !isFormValid()}
-          className="w-full btn-primary py-4 rounded-xl text-h3 shadow-elevated disabled:opacity-40 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center gap-2"
+          className={`w-full py-4 rounded-xl text-h3 flex items-center justify-center gap-2 transition-all ${
+            isSubmitting || !isFormValid()
+              ? 'bg-gray-300 text-gray-500 cursor-not-allowed shadow-none'
+              : 'btn-primary shadow-elevated'
+          }`}
         >
           {isSubmitting ? (
             <>
-              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="w-5 h-5 border-2 border-gray-400/30 border-t-gray-500 rounded-full animate-spin" />
               <span>Publishing...</span>
             </>
           ) : (

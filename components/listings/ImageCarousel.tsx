@@ -104,7 +104,7 @@ export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
 
       {/* Dots Indicator - Below Image */}
       {images.length > 1 && (
-        <div className="flex items-center justify-center gap-1.5 py-1">
+        <div className="flex items-center justify-center gap-1.5 py-1.5">
           {images.map((_, index) => (
             <button
               key={index}

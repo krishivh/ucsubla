@@ -38,7 +38,7 @@ export default function BookmarksPage() {
       {/* Content */}
       <main className="px-5 pt-4">
         {bookmarkedListings.length > 0 ? (
-          <div className="space-y-3">
+          <div className="space-y-4">
             {bookmarkedListings.map((listing) => (
               <ListingCard
                 key={listing.id}

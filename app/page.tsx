@@ -96,7 +96,7 @@ export default function Home() {
         </h2>
 
         {/* Listings grid */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           {displayedListings.length > 0 ? (
             displayedListings.map(listing => (
               <ListingCard

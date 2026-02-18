@@ -199,6 +199,11 @@
     appearance: none;
     min-height: 44px;
     text-align: left !important;
+    direction: ltr;
+  }
+
+  input[type="date"]::-webkit-date-and-time-value {
+    text-align: left;
   }
 
   input[type="date"]::-webkit-calendar-picker-indicator {

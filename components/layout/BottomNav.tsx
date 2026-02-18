@@ -18,7 +18,10 @@ export default function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 bg-white/90 backdrop-blur-[12px] border-t border-borderLight shadow-elevated z-50">
       <div className="flex items-center justify-between px-6 py-3 pb-safe app-container">
         {navItems.map((item) => {
-          const isActive = pathname === item.path;
+          // Home is active for home page AND create listing page
+          const isActive = item.path === '/'
+            ? pathname === '/' || pathname.startsWith('/listing/new')
+            : pathname === item.path;
           return (
             <Link
               key={item.path}

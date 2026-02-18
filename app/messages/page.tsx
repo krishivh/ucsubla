@@ -125,10 +125,8 @@ export default function MessagesPage() {
   return (
     <div className="min-h-screen bg-background app-container">
       {/* Chat Header */}
-      <div className="fixed top-0 left-0 right-0 z-40" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
-        <div className="absolute top-0 left-0 right-0 bg-background/70 nav-blur-layer border-b-[1.5px] border-white/80" style={{ height: 'calc(env(safe-area-inset-top) + 60px)' }} />
-        <div className="relative px-4 py-3">
-          <div className="flex items-center gap-3">
+      <div className="blurHeaderWithNav app-container">
+        <div className="blurHeaderWithNavContent">
           <button
             onClick={() => setSelectedConversationId(null)}
             className="p-1.5 hover:bg-gray-100 rounded-full transition-colors -ml-1.5"
@@ -137,25 +135,26 @@ export default function MessagesPage() {
             <Icon name="chevron.left" size={24} className="text-darkSlate" />
           </button>
 
-          <div className="w-10 h-10 rounded-full bg-uclaBlue flex items-center justify-center">
-            <span className="text-white font-medium text-small">
-              {getInitials(listerName)}
-            </span>
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <h2 className="text-h3 text-darkSlate truncate">
-              {listing?.address || 'Unknown Listing'}
-            </h2>
-            <div className="flex items-center gap-1">
-              <p className="text-small text-slateGray truncate">
-                {listerName}
-              </p>
-              {listerVerified && (
-                <Icon name="checkmark.seal.fill" size={14} className="text-slateGray flex-shrink-0" />
-              )}
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <div className="w-10 h-10 rounded-full bg-uclaBlue flex items-center justify-center">
+              <span className="text-white font-medium text-small">
+                {getInitials(listerName)}
+              </span>
             </div>
-          </div>
+
+            <div className="flex-1 min-w-0">
+              <h2 className="text-h3 text-darkSlate truncate">
+                {listing?.address || 'Unknown Listing'}
+              </h2>
+              <div className="flex items-center gap-1">
+                <p className="text-small text-slateGray truncate">
+                  {listerName}
+                </p>
+                {listerVerified && (
+                  <Icon name="checkmark.seal.fill" size={14} className="text-slateGray flex-shrink-0" />
+                )}
+              </div>
+            </div>
           </div>
         </div>
       </div>

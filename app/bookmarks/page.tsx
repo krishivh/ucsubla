@@ -24,7 +24,7 @@ export default function BookmarksPage() {
   };
 
   return (
-    <div className="min-h-screen pb-20 bg-background app-container">
+    <div className="min-h-screen pb-28 bg-background app-container">
       {/* Header */}
       <div className="blurHeader app-container">
         <div className="blurHeaderContent">

@@ -57,27 +57,34 @@ export default function ImageCarousel({ images, alt }: ImageCarouselProps) {
     <div className="w-full bg-background">
       {/* Image Container */}
       <div
-        className="relative w-full h-[281px] bg-gray-200"
+        className="relative w-full h-[281px] bg-gray-200 overflow-hidden"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
-        {/* Main Image */}
-        <div className="relative w-full h-full">
-          {!imageError[currentIndex] ? (
-            <Image
-              src={images[currentIndex]}
-              alt={`${alt} - Image ${currentIndex + 1}`}
-              fill
-              className="object-cover"
-              priority={currentIndex === 0}
-              onError={() => setImageError({ ...imageError, [currentIndex]: true })}
-            />
-          ) : (
-            <div className="flex items-center justify-center h-full bg-gray-100">
-              <Icon name="house" size={64} className="text-gray-300" />
+        {/* Sliding image strip */}
+        <div
+          className="flex h-full transition-transform duration-300 ease-out"
+          style={{ transform: `translateX(-${currentIndex * 100}%)`, width: `${images.length * 100}%` }}
+        >
+          {images.map((src, i) => (
+            <div key={i} className="relative h-full flex-shrink-0" style={{ width: `${100 / images.length}%` }}>
+              {!imageError[i] ? (
+                <Image
+                  src={src}
+                  alt={`${alt} - Image ${i + 1}`}
+                  fill
+                  className="object-cover"
+                  priority={i === 0}
+                  onError={() => setImageError({ ...imageError, [i]: true })}
+                />
+              ) : (
+                <div className="flex items-center justify-center h-full bg-gray-100">
+                  <Icon name="house" size={64} className="text-gray-300" />
+                </div>
+              )}
             </div>
-          )}
+          ))}
         </div>
 
         {/* Navigation Arrows */}

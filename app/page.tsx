@@ -80,7 +80,7 @@ export default function Home() {
   );
 
   return (
-    <div className="min-h-screen pb-20 bg-background app-container">
+    <div className="min-h-screen pb-28 bg-background app-container">
       <Header
         onFilterClick={handleFilterClick}
         onSearchChange={handleSearchChange}

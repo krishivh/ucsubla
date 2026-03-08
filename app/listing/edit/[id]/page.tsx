@@ -26,11 +26,16 @@ export default function EditListingPage() {
     amenities: {
       furnished: false, internet: false, ac: false, fridge: false,
       microwave: false, dishwasher: false, laundryInUnit: false,
-      laundryOnSite: false, balcony: false, parking: null,
+      laundryOnSite: false, balcony: false, parking: null as ParkingType | null,
       fitnessCenter: false, pool: false, hotTub: false,
       accessible: false, groundFloor: false,
     },
   });
+
+  // New image files selected by the user (not yet uploaded)
+  const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
+  // Preview URLs for new files (blob URLs)
+  const [newImagePreviews, setNewImagePreviews] = useState<string[]>([]);
 
   useEffect(() => {
     fetch(`/api/listings/${listingId}`)
@@ -73,13 +78,58 @@ export default function EditListingPage() {
     setFormData(prev => ({ ...prev, quarters, moveInDate: moveIn, moveOutDate: moveOut }));
   };
 
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+    const incoming = Array.from(files);
+    const totalImages = formData.images.length + newImageFiles.length + incoming.length;
+    if (totalImages > 8) { alert('Maximum 8 images allowed'); return; }
+    setNewImageFiles(prev => [...prev, ...incoming]);
+    setNewImagePreviews(prev => [...prev, ...incoming.map(f => URL.createObjectURL(f))]);
+  };
+
+  const removeExistingImage = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index),
+    }));
+  };
+
+  const removeNewImage = (index: number) => {
+    URL.revokeObjectURL(newImagePreviews[index]);
+    setNewImageFiles(prev => prev.filter((_, i) => i !== index));
+    setNewImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const toggleAmenity = (key: keyof Amenities) => {
+    setFormData(prev => ({ ...prev, amenities: { ...prev.amenities, [key]: !prev.amenities[key] } }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
     try {
+      // Upload any new image files to Supabase Storage
+      let uploadedUrls: string[] = [];
+      if (newImageFiles.length > 0) {
+        const uploadResults = await Promise.all(
+          newImageFiles.map(async (file) => {
+            const fd = new FormData();
+            fd.append('file', file);
+            const res = await fetch('/api/upload', { method: 'POST', body: fd });
+            if (res.ok) { const { url } = await res.json(); return url as string; }
+            return null;
+          })
+        );
+        uploadedUrls = uploadResults.filter(Boolean) as string[];
+      }
+
+      // Combine existing (already-uploaded) images with newly uploaded ones
+      const allImages = [...formData.images, ...uploadedUrls];
+
       const payload = {
         title: formData.title, price: Number(formData.price), address: formData.address,
-        distance_from_campus: formData.distanceFromCampus, images: formData.images,
+        distance_from_campus: formData.distanceFromCampus, images: allImages,
         room_type: formData.roomType, bathroom_type: formData.bathroomType,
         move_in_date: formData.moveInDate, move_out_date: formData.moveOutDate,
         quarter: formData.quarters, roommate_preference: formData.roommatePreference,
@@ -100,6 +150,9 @@ export default function EditListingPage() {
   const roomTypeOptions = [{ value: 'single', label: 'Single' }, { value: 'double', label: 'Double' }, { value: 'triple+', label: 'Triple+' }];
   const bathroomOptions = [{ value: 'private', label: 'Private' }, { value: 'shared', label: 'Shared' }];
   const roommateOptions = [{ value: 'male', label: 'Male' }, { value: 'female', label: 'Female' }, { value: 'coed', label: 'Co-Ed' }];
+  const parkingOptions = [{ value: 'covered', label: 'Covered' }, { value: 'garage', label: 'Garage' }];
+
+  const totalImages = formData.images.length + newImageFiles.length;
 
   if (loading) return (
     <div className="min-h-screen flex items-center justify-center bg-background">
@@ -174,11 +227,91 @@ export default function EditListingPage() {
           </div>
         </div>
 
+        {/* Amenities */}
+        <div className="space-y-6">
+          <h2 className="text-h2 text-darkSlate">Amenities</h2>
+          {[
+            { label: 'Essentials', items: [{ key: 'furnished', label: 'Furnished' }, { key: 'internet', label: 'Internet' }, { key: 'ac', label: 'AC' }] },
+            { label: 'Appliances', items: [{ key: 'fridge', label: 'Fridge' }, { key: 'microwave', label: 'Microwave' }, { key: 'dishwasher', label: 'Dishwasher' }, { key: 'laundryInUnit', label: 'In-Unit Laundry' }, { key: 'laundryOnSite', label: 'On-Site Laundry' }] },
+            { label: 'Building', items: [{ key: 'fitnessCenter', label: 'Fitness Center' }, { key: 'pool', label: 'Pool' }, { key: 'hotTub', label: 'Hot Tub/Spa' }, { key: 'balcony', label: 'Balcony/Patio' }] },
+          ].map(section => (
+            <div key={section.label}>
+              <h3 className="text-body text-darkSlate font-medium mb-3">{section.label}</h3>
+              <div className="flex flex-wrap gap-2">
+                {section.items.map(item => (
+                  <button key={item.key} type="button" onClick={() => toggleAmenity(item.key as keyof Amenities)}
+                    className={`px-4 py-2.5 rounded-xl border transition-colors ${formData.amenities[item.key as keyof Amenities] ? 'bg-uclaBlue/10 border-uclaBlue text-uclaBlue font-medium' : 'bg-white border-gray-200 text-slateGray'}`}>
+                    <span className="text-body">{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+          <div>
+            <h3 className="text-body text-darkSlate font-medium mb-3">Parking</h3>
+            <div className="flex flex-wrap gap-2">
+              {parkingOptions.map(opt => (
+                <button key={opt.value} type="button"
+                  onClick={() => setFormData(p => ({ ...p, amenities: { ...p.amenities, parking: p.amenities.parking === opt.value ? null : opt.value as ParkingType } }))}
+                  className={`px-4 py-2.5 rounded-xl border transition-colors ${formData.amenities.parking === opt.value ? 'bg-uclaBlue/10 border-uclaBlue text-uclaBlue font-medium' : 'bg-white border-gray-200 text-slateGray'}`}>
+                  <span className="text-body">{opt.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Images */}
+        <div>
+          <h2 className="text-h2 text-darkSlate mb-2">Images</h2>
+          <p className="text-small text-slateGray mb-3">Upload photos from your device (max 8)</p>
+
+          {/* Existing images (already uploaded to Supabase) */}
+          {(formData.images.length > 0 || newImagePreviews.length > 0) && (
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              {formData.images.map((url, index) => (
+                <div key={`existing-${index}`} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
+                  <img src={url} alt={`Image ${index + 1}`} className="w-full h-full object-cover" />
+                  <button type="button" onClick={() => removeExistingImage(index)}
+                    className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm p-1.5 rounded-full hover:bg-white transition-colors">
+                    <Icon name="xmark" size={16} className="text-darkSlate" />
+                  </button>
+                </div>
+              ))}
+              {newImagePreviews.map((url, index) => (
+                <div key={`new-${index}`} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
+                  <img src={url} alt={`New ${index + 1}`} className="w-full h-full object-cover" />
+                  <div className="absolute top-2 left-2 bg-uclaBlue/80 text-white text-xs px-2 py-0.5 rounded-full">New</div>
+                  <button type="button" onClick={() => removeNewImage(index)}
+                    className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm p-1.5 rounded-full hover:bg-white transition-colors">
+                    <Icon name="xmark" size={16} className="text-darkSlate" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {totalImages < 8 && (
+            <label className="block">
+              <input type="file" accept="image/*" multiple onChange={handleImageUpload} className="hidden" />
+              <div className="bg-white border-2 border-dashed border-border rounded-lg p-8 text-center cursor-pointer hover:border-uclaBlue transition-colors">
+                <Icon name="plus" size={32} className="text-slateGray mx-auto mb-2" />
+                <p className="text-body text-darkSlate font-medium mb-1">Upload Photos</p>
+                <p className="text-small text-slateGray">{totalImages} of 8 photos</p>
+              </div>
+            </label>
+          )}
+        </div>
+
         <div>
           <label className="block text-h2 text-darkSlate mb-2">Description</label>
           <textarea value={formData.description} onChange={(e) => setFormData(p => ({ ...p, description: e.target.value }))}
             rows={6} maxLength={1000}
             className="w-full bg-white border border-border rounded-lg px-4 py-3 text-body text-darkSlate focus:outline-none focus:ring-2 focus:ring-uclaBlue resize-none" />
+          <div className="flex justify-between mt-1">
+            <div />
+            <p className="text-small text-slateGray">{formData.description.length}/1000</p>
+          </div>
         </div>
 
         {errors.submit && (

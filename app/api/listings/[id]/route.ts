@@ -65,13 +65,27 @@ export async function PATCH(
 
   const body = await request.json();
 
-  const { data, error } = await supabase
-    .from('listings')
-    .update(body)
-    .eq('id', id)
-    .eq('lister_id', user.id)
-    .select()
-    .single();
+// Allowlist of valid DB columns to prevent arbitrary column injection
+const ALLOWED_FIELDS = [
+  'title', 'price', 'address', 'distance_from_campus', 'images',
+  'room_type', 'bathroom_type', 'move_in_date', 'move_out_date',
+  'quarter', 'roommate_preference', 'amenities', 'description',
+];
+
+const dbUpdate: Record<string, unknown> = {};
+for (const key of ALLOWED_FIELDS) {
+  if (body[key] !== undefined) {
+    dbUpdate[key] = body[key];
+  }
+}
+
+const { data, error } = await supabase
+  .from('listings')
+  .update(dbUpdate)
+  .eq('id', id)
+  .eq('lister_id', user.id)
+  .select()
+  .single();
 
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 400 });

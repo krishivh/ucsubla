@@ -1,154 +1,85 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
 import Icon from '@/components/common/Icon';
 import BottomNav from '@/components/layout/BottomNav';
-import { mockUser, mockListings } from '@/lib/mockData';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { getInitials } from '@/lib/utils';
 
 export default function ProfilePage() {
   const router = useRouter();
-  const [displayName, setDisplayName] = useState(mockUser.name);
-  const [toast, setToast] = useState<string | null>(null);
+  const { profile, supabaseUser, signOut, loading } = useAuth();
 
-  useEffect(() => {
-    const saved = localStorage.getItem('user-profile');
-    if (saved) {
-      const parsed = JSON.parse(saved);
-      if (parsed.name) setDisplayName(parsed.name);
-    }
-  }, []);
-
-  const showToast = (msg: string) => {
-    setToast(msg);
-    setTimeout(() => setToast(null), 2500);
+  const handleSignOut = async () => {
+    await signOut();
+    router.push('/login');
   };
 
-  const userListings = typeof window !== 'undefined'
-    ? JSON.parse(localStorage.getItem('user-listings') || '[]')
-    : [];
-  const myListingsCount = mockListings.filter((l) => l.listerId === mockUser.id).length + userListings.length;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center app-container">
+        <div className="w-8 h-8 border-2 border-uclaBlue/30 border-t-uclaBlue rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  const displayName = profile?.name ?? supabaseUser?.email?.split('@')[0] ?? 'Bruin';
+  const email = profile?.email ?? supabaseUser?.email ?? '';
 
   const menuItems = [
-    {
-      icon: 'house',
-      label: 'My Listings',
-      count: myListingsCount,
-      onClick: () => router.push('/my-listings'),
-    },
-    {
-      icon: 'bookmark',
-      label: 'Saved',
-      count: mockUser.bookmarks.length,
-      onClick: () => router.push('/bookmarks'),
-    },
-    {
-      icon: 'person',
-      label: 'Account Settings',
-      onClick: () => router.push('/settings'),
-    },
-    {
-      icon: 'checkmark.seal.fill',
-      label: 'Verification',
-      badge: mockUser.verifiedUCLA ? 'Verified' : 'Not Verified',
-      onClick: () => showToast('UCLA verification coming soon'),
-    },
+    { icon: 'house', label: 'My Listings', onClick: () => router.push('/my-listings') },
+    { icon: 'bookmark', label: 'Saved', onClick: () => router.push('/bookmarks') },
+    { icon: 'person', label: 'Account Settings', onClick: () => router.push('/settings') },
   ];
 
   return (
     <div className="min-h-screen pb-20 bg-background app-container">
-      {/* Toast */}
-      {toast && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-darkSlate text-white text-small font-medium px-4 py-2 rounded-full shadow-elevated whitespace-nowrap">
-          {toast}
-        </div>
-      )}
-
-      {/* Header */}
       <div className="blurHeader app-container">
         <div className="blurHeaderContent">
           <h1 className="text-h1 text-darkSlate">Profile</h1>
         </div>
       </div>
-
-      {/* Spacer for fixed nav */}
       <div className="h-[52px]" style={{ marginTop: 'env(safe-area-inset-top)' }} />
 
-      {/* Profile Info */}
       <div className="px-5 pt-4 mb-6">
         <div className="card p-5">
-          <button
-            onClick={() => router.push('/profile/edit')}
-            className="flex items-center gap-3 mb-3 w-full text-left hover:opacity-80 transition-opacity"
-          >
-            {/* Avatar */}
+          <div className="flex items-center gap-4">
             <div className="w-16 h-16 rounded-full bg-uclaBlue flex items-center justify-center flex-shrink-0">
-              <span className="text-white font-medium text-xl">
-                {getInitials(displayName)}
-              </span>
+              <span className="text-white text-xl font-medium">{getInitials(displayName)}</span>
             </div>
-
-            {/* User Info */}
-            <div className="flex-1">
-              <h2 className="text-h2 text-darkSlate">{displayName}</h2>
-              <p className="text-body text-slateGray">{mockUser.email}</p>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-h2 text-darkSlate truncate">{displayName}</h2>
+              <p className="text-body text-slateGray truncate">{email}</p>
+              {profile?.verifiedUCLA && (
+                <div className="flex items-center gap-1 mt-1">
+                  <Icon name="checkmark.seal.fill" size={14} className="text-uclaBlue" />
+                  <span className="text-small text-uclaBlue font-medium">UCLA Verified</span>
+                </div>
+              )}
             </div>
-
-            <Icon name="chevron.right" size={18} className="text-lightSlate" />
-          </button>
-
-          {/* Verification Badge */}
-          {mockUser.verifiedUCLA && (
-            <div className="bg-uclaBlue/10 border border-uclaBlue/20 rounded-lg px-3 py-2 flex items-center gap-2">
-              <Icon name="checkmark.seal.fill" size={16} className="text-uclaBlue" />
-              <span className="text-small text-uclaBlue font-medium">
-                Verified UCLA Student
-              </span>
-            </div>
-          )}
+          </div>
         </div>
       </div>
 
-      {/* Menu Items */}
       <div className="px-5 space-y-2">
-        {menuItems.map((item, index) => (
+        {menuItems.map((item) => (
           <button
-            key={index}
+            key={item.label}
             onClick={item.onClick}
-            className="w-full card p-4 hover:bg-gray-50 transition-colors flex items-center justify-between"
+            className="w-full card p-4 flex items-center gap-3 hover:bg-gray-50 transition-colors"
           >
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center">
-                <Icon name={item.icon} size={20} className="text-uclaBlue" />
-              </div>
-              <span className="text-body text-darkSlate font-medium">
-                {item.label}
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2">
-              {item.count !== undefined && (
-                <span className="text-small text-slateGray">{item.count}</span>
-              )}
-              {item.badge && (
-                <span className="text-small text-uclaBlue font-medium">
-                  {item.badge}
-                </span>
-              )}
-              <Icon name="chevron.right" size={20} className="text-slateGray" />
-            </div>
+            <Icon name={item.icon} size={20} className="text-uclaBlue" />
+            <span className="text-body text-darkSlate flex-1 text-left">{item.label}</span>
+            <Icon name="chevron.right" size={16} className="text-lightSlate" />
           </button>
         ))}
-      </div>
 
-      {/* Logout Button */}
-      <div className="px-5 mt-6">
         <button
-          onClick={() => router.push('/login')}
-          className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-body text-red-500 font-medium hover:bg-red-50 transition-colors"
+          onClick={handleSignOut}
+          className="w-full card p-4 flex items-center gap-3 hover:bg-red-50 transition-colors mt-4"
         >
-          Log Out
+          <Icon name="arrow.right.square" size={20} className="text-red-500" />
+          <span className="text-body text-red-500 flex-1 text-left">Sign Out</span>
         </button>
       </div>
 

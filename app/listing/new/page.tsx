@@ -6,12 +6,13 @@ import Icon from '@/components/common/Icon';
 import ChipGroup from '@/components/filters/ChipGroup';
 import RangeSlider from '@/components/filters/RangeSlider';
 import BottomNav from '@/components/layout/BottomNav';
-import { mockUser } from '@/lib/mockData';
+import { useAuth } from '@/lib/hooks/useAuth';
 import { formatPrice } from '@/lib/utils';
 import type { Listing, Quarter, RoomType, BathroomType, RoommatePreference, ParkingType, Amenities } from '@/lib/types';
 
 export default function CreateListingPage() {
   const router = useRouter();
+  const { supabaseUser } = useAuth();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const hasAutoFilledQuarters = useRef(false);
@@ -266,37 +267,65 @@ export default function CreateListingPage() {
 
     setIsSubmitting(true);
 
-    // Create new listing
-    const newListing: Listing = {
-      id: `listing-${Date.now()}`,
-      title: formData.title,
-      price: Number(formData.price),
-      address: formData.address,
-      distanceFromCampus: formData.distanceFromCampus,
-      images: formData.images.filter(img => img.trim()),
-      roomType: formData.roomType as RoomType,
-      bathroomType: formData.bathroomType as BathroomType,
-      moveInDate: formData.moveInDate,
-      moveOutDate: formData.moveOutDate,
-      quarter: formData.quarters,
-      roommatePreference: formData.roommatePreference as RoommatePreference,
-      verifiedUCLA: mockUser.verifiedUCLA,
-      amenities: formData.amenities,
-      description: formData.description,
-      listerId: mockUser.id,
-      createdAt: new Date().toISOString(),
-    };
+    try {
+      // 1. Upload images to Supabase Storage
+      let imageUrls: string[] = [];
+      if (imageFiles.length > 0) {
+        const uploadResults = await Promise.all(
+          imageFiles.map(async (file) => {
+            const fd = new FormData();
+            fd.append('file', file);
+            const res = await fetch('/api/upload', { method: 'POST', body: fd });
+            if (res.ok) {
+              const { url } = await res.json();
+              return url as string;
+            }
+            return null;
+          })
+        );
+        imageUrls = uploadResults.filter(Boolean) as string[];
+      }
 
-    // Save to localStorage (mock persistence)
-    const savedListings = JSON.parse(localStorage.getItem('user-listings') || '[]');
-    savedListings.push(newListing);
-    localStorage.setItem('user-listings', JSON.stringify(savedListings));
+      // Fall back to any preview URLs if upload failed / no files
+      if (imageUrls.length === 0) {
+        imageUrls = formData.images.filter(img => img.trim());
+      }
 
-    // Simulate API call delay
-    await new Promise(resolve => setTimeout(resolve, 1000));
+      // 2. Create listing via API
+      const payload = {
+        title: formData.title,
+        price: Number(formData.price),
+        address: formData.address,
+        distanceFromCampus: formData.distanceFromCampus,
+        images: imageUrls,
+        roomType: formData.roomType as RoomType,
+        bathroomType: formData.bathroomType as BathroomType,
+        moveInDate: formData.moveInDate,
+        moveOutDate: formData.moveOutDate,
+        quarter: formData.quarters,
+        roommatePreference: formData.roommatePreference as RoommatePreference,
+        amenities: formData.amenities,
+        description: formData.description,
+      };
 
-    // Redirect to the new listing
-    router.push(`/listing/${newListing.id}`);
+      const res = await fetch('/api/listings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        const { error } = await res.json();
+        throw new Error(error ?? 'Failed to publish listing');
+      }
+
+      const { listing } = await res.json();
+      router.push(`/listing/${listing.id}`);
+    } catch (err) {
+      console.error('Submit failed:', err);
+      setErrors({ submit: err instanceof Error ? err.message : 'Failed to publish. Try again.' });
+      setIsSubmitting(false);
+    }
   };
 
   const roomTypeOptions = [

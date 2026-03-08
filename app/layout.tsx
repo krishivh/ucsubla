@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { AuthProvider } from "@/lib/hooks/useAuth";
 
 export const metadata: Metadata = {
   title: "UCSubLA - UCLA Subleasing",
@@ -28,7 +29,9 @@ export default function RootLayout({
         <meta name="theme-color" content="#F8FAFC" />
       </head>
       <body className="antialiased touch-pan-y">
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

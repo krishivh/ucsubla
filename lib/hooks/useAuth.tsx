@@ -70,14 +70,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase, fetchProfile]);
 
   const signInWithEmail = async (email: string) => {
-    const normalized = email.toLowerCase().trim();
+    let normalized = email.toLowerCase().trim();
     
-    // Accept both @ucla.edu and @g.ucla.edu
-    const isValidUCLA = normalized.endsWith('@ucla.edu') || normalized.endsWith('@g.ucla.edu');
-    if (!isValidUCLA) {
+    if (normalized.endsWith('@g.ucla.edu')) {
+      normalized = normalized.replace('@g.ucla.edu', '@ucla.edu');
+    }
+    
+    if (!normalized.endsWith('@ucla.edu')) {
       return { error: 'Only UCLA email addresses (@ucla.edu or @g.ucla.edu) are allowed.' };
     }
-
+  
     const { error } = await supabase.auth.signInWithOtp({
       email: normalized,
       options: {
@@ -85,7 +87,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         shouldCreateUser: true,
       },
     });
-
+  
     return { error: error?.message ?? null };
   };
 

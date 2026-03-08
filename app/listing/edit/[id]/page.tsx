@@ -46,7 +46,7 @@ export default function EditListingPage() {
             moveInDate: l.moveInDate, moveOutDate: l.moveOutDate,
             quarters: l.quarter, price: String(l.price),
             images: l.images, description: l.description,
-            amenities: l.amenities,
+            amenities: l.amenities as typeof formData.amenities,
           });
         }
       })

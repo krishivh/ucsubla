@@ -11,17 +11,28 @@ import { filterListings } from '@/lib/utils';
 import type { FilterState } from '@/lib/types';
 
 const DEFAULT_FILTERS: FilterState = {
-  verifiedOnly: false,
-  moveInDate: null,
-  moveOutDate: null,
-  quarters: [],
-  maxRent: 4000,
-  maxDistance: 4,
-  roomTypes: [],
-  bathroomTypes: [],
-  roommatePreferences: [],
-  amenities: {},
+  verifiedOnly: false, moveInDate: null, moveOutDate: null, quarters: [],
+  maxRent: 4000, maxDistance: 4, roomTypes: [], bathroomTypes: [],
+  roommatePreferences: [], amenities: {},
 };
+
+function ListingSkeleton() {
+  return (
+    <div className="card overflow-hidden animate-pulse">
+      <div className="h-56 skeleton" />
+      <div className="p-4 space-y-3">
+        <div className="h-4 skeleton rounded w-3/4" />
+        <div className="h-3 skeleton rounded w-1/2" />
+        <div className="h-3 skeleton rounded w-1/3" />
+        <div className="flex gap-2 mt-2">
+          <div className="h-8 skeleton rounded-lg w-20" />
+          <div className="h-8 skeleton rounded-lg w-20" />
+          <div className="h-8 skeleton rounded-lg w-24" />
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -33,9 +44,7 @@ export default function Home() {
 
   useEffect(() => {
     const saved = localStorage.getItem('ucsubla-filters');
-    if (saved) {
-      try { setFilters(JSON.parse(saved)); } catch {}
-    }
+    if (saved) { try { setFilters(JSON.parse(saved)); } catch {} }
   }, []);
 
   const handleApplyFilters = (newFilters: FilterState) => {
@@ -47,10 +56,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen pb-28 bg-background app-container">
-      <Header
-        onFilterClick={() => setIsFilterOpen(true)}
-        onSearchChange={setSearchQuery}
-      />
+      <Header onFilterClick={() => setIsFilterOpen(true)} onSearchChange={setSearchQuery} />
       <div className="h-[108px] safe-area-top" />
 
       <main className="px-5 pt-3">
@@ -58,9 +64,7 @@ export default function Home() {
 
         {loading ? (
           <div className="space-y-4">
-            {[1, 2, 3].map(i => (
-              <div key={i} className="card h-48 animate-pulse bg-gray-100 rounded-2xl" />
-            ))}
+            {[1, 2, 3].map(i => <ListingSkeleton key={i} />)}
           </div>
         ) : error ? (
           <div className="text-center py-12">
@@ -69,12 +73,9 @@ export default function Home() {
         ) : displayed.length > 0 ? (
           <div className="space-y-4">
             {displayed.map(listing => (
-              <ListingCard
-                key={listing.id}
-                listing={listing}
+              <ListingCard key={listing.id} listing={listing}
                 isBookmarked={bookmarkedIds.includes(listing.id)}
-                onBookmarkToggle={toggleBookmark}
-              />
+                onBookmarkToggle={toggleBookmark} />
             ))}
           </div>
         ) : (
@@ -85,14 +86,8 @@ export default function Home() {
       </main>
 
       <BottomNav />
-
-      <FilterModal
-        isOpen={isFilterOpen}
-        onClose={() => setIsFilterOpen(false)}
-        filters={filters}
-        onApply={handleApplyFilters}
-        resultCount={displayed.length}
-      />
+      <FilterModal isOpen={isFilterOpen} onClose={() => setIsFilterOpen(false)}
+        filters={filters} onApply={handleApplyFilters} resultCount={displayed.length} />
     </div>
   );
 }

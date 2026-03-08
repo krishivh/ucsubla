@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
   const buffer = new Uint8Array(arrayBuffer);
 
   const { error: uploadError } = await supabase.storage
-    .from('listing_images')
+    .from('listing-images')
     .upload(fileName, buffer, { contentType: file.type, upsert: false });
 
   if (uploadError) {
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
   }
 
   const { data: { publicUrl } } = supabase.storage
-    .from('listing_images')
+    .from('listing-images')
     .getPublicUrl(fileName);
 
   return NextResponse.json({ url: publicUrl }, { status: 201 });

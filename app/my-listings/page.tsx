@@ -19,9 +19,10 @@ export default function MyListingsPage() {
   };
 
   const handleDelete = async (id: string) => {
+    if (!confirm('Delete this listing?')) return;
     try {
       await deleteListing(id);
-      showToast('Listing removed');
+      showToast('Listing deleted');
     } catch {
       showToast('Failed to delete listing');
     }
@@ -30,7 +31,7 @@ export default function MyListingsPage() {
   return (
     <div className="min-h-screen pb-24 bg-background app-container">
       {toast && (
-        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-darkSlate text-white text-small font-medium px-4 py-2 rounded-full shadow-elevated whitespace-nowrap">
+        <div className="fixed top-24 left-1/2 -translate-x-1/2 z-50 bg-darkSlate text-white text-small font-medium px-4 py-2 rounded-full shadow-elevated whitespace-nowrap animate-fade-in">
           {toast}
         </div>
       )}
@@ -52,7 +53,17 @@ export default function MyListingsPage() {
 
       <div className="px-5 pt-4 space-y-4">
         {loading ? (
-          [1, 2].map(i => <div key={i} className="card h-28 animate-pulse bg-gray-100 rounded-2xl" />)
+          // Skeleton loading
+          [1, 2, 3].map(i => (
+            <div key={i} className="card p-4 flex gap-3 animate-pulse">
+              <div className="w-20 h-20 rounded-xl bg-gray-200 flex-shrink-0" />
+              <div className="flex-1 space-y-2 py-1">
+                <div className="h-4 bg-gray-200 rounded w-3/4" />
+                <div className="h-3 bg-gray-200 rounded w-1/2" />
+                <div className="h-3 bg-gray-200 rounded w-1/3" />
+              </div>
+            </div>
+          ))
         ) : listings.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-24 text-center px-8">
             <div className="w-16 h-16 rounded-full bg-uclaBlue/10 flex items-center justify-center mb-4">
@@ -67,20 +78,33 @@ export default function MyListingsPage() {
         ) : (
           listings.map(listing => (
             <div key={listing.id} className="card p-4 flex gap-3">
-              {listing.images[0] && (
-                <img src={listing.images[0]} alt={listing.title} className="w-20 h-20 object-cover rounded-xl flex-shrink-0" />
+              {listing.images[0] ? (
+                <img src={listing.images[0]} alt={listing.title}
+                  className="w-20 h-20 object-cover rounded-xl flex-shrink-0" />
+              ) : (
+                <div className="w-20 h-20 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0">
+                  <Icon name="house" size={24} className="text-lightSlate" />
+                </div>
               )}
               <div className="flex-1 min-w-0">
                 <p className="text-h3 text-darkSlate truncate">{listing.title}</p>
                 <p className="text-body text-uclaBlue font-medium">{formatPrice(listing.price)}/mo</p>
                 <p className="text-small text-slateGray">{formatDateRange(listing.moveInDate, listing.moveOutDate)}</p>
               </div>
-              <button
-                onClick={() => handleDelete(listing.id)}
-                className="p-2 hover:bg-red-50 rounded-lg transition-colors flex-shrink-0"
-              >
-                <Icon name="trash" size={18} className="text-red-500" />
-              </button>
+              <div className="flex flex-col gap-2 flex-shrink-0">
+                <button
+                  onClick={() => router.push(`/listing/edit/${listing.id}`)}
+                  className="p-2 hover:bg-uclaBlue/10 rounded-lg transition-colors"
+                >
+                  <Icon name="pencil" size={18} className="text-uclaBlue" />
+                </button>
+                <button
+                  onClick={() => handleDelete(listing.id)}
+                  className="p-2 hover:bg-red-50 rounded-lg transition-colors"
+                >
+                  <Icon name="trash" size={18} className="text-red-500" />
+                </button>
+              </div>
             </div>
           ))
         )}

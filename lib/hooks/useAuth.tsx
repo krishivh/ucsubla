@@ -35,7 +35,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .single();
 
     if (data) {
-      // Get bookmarks too
       const { data: bookmarks } = await supabase
         .from('bookmarks')
         .select('listing_id')
@@ -71,12 +70,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [supabase, fetchProfile]);
 
   const signInWithEmail = async (email: string) => {
-    if (!email.toLowerCase().endsWith('@ucla.edu')) {
-      return { error: 'Only @ucla.edu email addresses are allowed.' };
+    const normalized = email.toLowerCase().trim();
+    
+    // Accept both @ucla.edu and @g.ucla.edu
+    const isValidUCLA = normalized.endsWith('@ucla.edu') || normalized.endsWith('@g.ucla.edu');
+    if (!isValidUCLA) {
+      return { error: 'Only UCLA email addresses (@ucla.edu or @g.ucla.edu) are allowed.' };
     }
 
     const { error } = await supabase.auth.signInWithOtp({
-      email,
+      email: normalized,
       options: {
         emailRedirectTo: `${window.location.origin}/auth/callback`,
         shouldCreateUser: true,

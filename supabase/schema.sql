@@ -172,7 +172,7 @@ create policy "messages_update" on public.messages for update
 -- STORAGE BUCKET for listing images
 -- ============================================================
 -- Run this separately in Storage section or via SQL:
--- insert into storage.buckets (id, name, public) values ('listing-images', 'listing-images', true);
--- create policy "listing_images_public_read" on storage.objects for select using (bucket_id = 'listing-images');
--- create policy "listing_images_auth_upload" on storage.objects for insert with check (bucket_id = 'listing-images' and auth.role() = 'authenticated');
--- create policy "listing_images_owner_delete" on storage.objects for delete using (bucket_id = 'listing-images' and auth.uid()::text = (storage.foldername(name))[1]);
+-- insert into storage.buckets (id, name, public) values ('listing_images', 'listing_images', true);
+-- create policy "listing_images_public_read" on storage.objects for select using (bucket_id = 'listing_images');
+-- create policy "listing_images_auth_upload" on storage.objects for insert with check (bucket_id = 'listing_images' and auth.role() = 'authenticated');
+-- create policy "listing_images_owner_delete" on storage.objects for delete using (bucket_id = 'listing_images' and auth.uid()::text = (storage.foldername(name))[1]);

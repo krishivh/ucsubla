@@ -31,10 +31,10 @@
 ## 3. Create the Storage bucket
 
 In Supabase dashboard → **Storage** → **New bucket**:
-- Name: `listing-images`
+- Name: `listing_images`
 - Public: ✅ (checked)
 
-Then in **Storage → Policies**, add these policies for `listing-images`:
+Then in **Storage → Policies**, add these policies for `listing_images`:
 - **SELECT**: `true` (anyone can read)
 - **INSERT**: `auth.role() = 'authenticated'` (logged-in users can upload)
 - **DELETE**: `auth.uid()::text = (storage.foldername(name))[1]` (only uploader)

@@ -27,7 +27,7 @@ export default function ListingCard({ listing, isBookmarked, onBookmarkToggle }:
       <div className="card shadow-minimal hover:shadow-card transition-shadow duration-200">
         {/* Image */}
         <div className="relative h-56 bg-gray-200 overflow-hidden">
-          {!imageError ? (
+          {!imageError && listing.images[0] ? (
             <Image
               src={listing.images[0]}
               alt={listing.title}

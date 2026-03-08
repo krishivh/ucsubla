@@ -26,8 +26,9 @@ export default function EditListingPage() {
     amenities: {
       furnished: false, internet: false, ac: false, fridge: false,
       microwave: false, dishwasher: false, laundryInUnit: false,
-      laundryOnSite: false, balcony: false, parking: null as ParkingType | null,
-      fitnessCenter: false, pool: false, hotTub: false, accessible: false, groundFloor: false,
+      laundryOnSite: false, balcony: false, parking: null,
+      fitnessCenter: false, pool: false, hotTub: false,
+      accessible: false, groundFloor: false,
     },
   });
 

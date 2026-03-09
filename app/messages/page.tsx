@@ -56,6 +56,9 @@ export default function MessagesPage() {
           c.lastMessage.created_at = lastMsg.timestamp;
         }
       });
+      // Update read timestamp to now so our own messages don't trigger the dot
+      readTimestamps[selectedId] = new Date().toISOString();
+      localStorage.setItem('bruinlease-read-ts', JSON.stringify(readTimestamps));
     }
     setSelectedId(null);
   };

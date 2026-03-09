@@ -362,7 +362,7 @@ export const mockReviews: Review[] = [
     listingId: '',
     address: '10982 Roebling Ave',
     source: 'reddit',
-    sourceUrl: 'https://www.reddit.com/r/ucla/comments/club_california_roebling',
+    sourceUrl: 'https://www.reddit.com/r/ucla/comments/1qgks4x/club_california_on_roebling_apartment_thoughts/',
     sourceName: 'r/ucla',
     text: 'anyone have experience with club California apartments? (10982 Roebling Ave) how\'s the cleanliness and noise level? I lived there last year — it\'s decent for the price. Walls are thin so you hear neighbors, but management is responsive and the location is unbeatable for south campus.',
     timestamp: '2025-11-18T14:22:00Z',

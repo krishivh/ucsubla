@@ -1,17 +1,31 @@
 'use client';
 
-import { useState, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useState, useRef, Suspense } from 'react';
+import { useSearchParams, useRouter } from 'next/navigation';
 import Icon from '@/components/common/Icon';
 import { useAuth } from '@/lib/hooks/useAuth';
 
 function LoginForm() {
-  const { signInWithEmail } = useAuth();
+  const { signInWithEmail, verifyOtp } = useAuth();
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [email, setEmail] = useState('');
+  const [normalizedEmail, setNormalizedEmail] = useState('');
   const [error, setError] = useState('');
   const [sent, setSent] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [otp, setOtp] = useState(['', '', '', '', '', '', '', '']);
+  const [verifying, setVerifying] = useState(false);
+  const inputRefs = [
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+    useRef<HTMLInputElement>(null),
+  ];
 
   const authError = searchParams.get('error');
 
@@ -21,6 +35,12 @@ function LoginForm() {
 
     if (!email) { setError('Please enter your email address'); return; }
 
+    let norm = email.toLowerCase().trim();
+    if (norm.endsWith('@g.ucla.edu')) {
+      norm = norm.replace('@g.ucla.edu', '@ucla.edu');
+    }
+    setNormalizedEmail(norm);
+
     setIsLoading(true);
     const { error: authErr } = await signInWithEmail(email);
     setIsLoading(false);
@@ -29,6 +49,55 @@ function LoginForm() {
       setError(authErr);
     } else {
       setSent(true);
+      setTimeout(() => inputRefs[0].current?.focus(), 100);
+    }
+  };
+
+  const handleOtpChange = (index: number, value: string) => {
+    if (!/^\d*$/.test(value)) return;
+    const newOtp = [...otp];
+    newOtp[index] = value.slice(-1);
+    setOtp(newOtp);
+
+    if (value && index < 7) {
+      inputRefs[index + 1].current?.focus();
+    }
+
+    if (newOtp.every(d => d !== '')) {
+      handleVerify(newOtp.join(''));
+    }
+  };
+
+  const handleOtpKeyDown = (index: number, e: React.KeyboardEvent) => {
+    if (e.key === 'Backspace' && !otp[index] && index > 0) {
+      inputRefs[index - 1].current?.focus();
+    }
+  };
+
+  const handleOtpPaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 8);
+    if (pasted.length === 8) {
+      const newOtp = pasted.split('');
+      setOtp(newOtp);
+      inputRefs[7].current?.focus();
+      handleVerify(pasted);
+    }
+  };
+
+  const handleVerify = async (code: string) => {
+    setVerifying(true);
+    setError('');
+    const { error: verifyErr } = await verifyOtp(normalizedEmail, code);
+    setVerifying(false);
+
+    if (verifyErr) {
+      setError('Invalid code. Please try again.');
+      setOtp(['', '', '', '', '', '', '', '']);
+      inputRefs[0].current?.focus();
+    } else {
+      const next = searchParams.get('next') || '/';
+      router.push(next);
     }
   };
 
@@ -36,24 +105,52 @@ function LoginForm() {
     return (
       <div className="w-full max-w-md">
         <div className="card p-6 text-center">
-          <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-            <Icon name="checkmark.seal.fill" size={32} className="text-green-600" />
+          <div className="w-16 h-16 rounded-full bg-uclaBlue/10 flex items-center justify-center mx-auto mb-4">
+            <Icon name="checkmark.seal.fill" size={32} className="text-uclaBlue" />
           </div>
-          <h2 className="text-h2 text-darkSlate mb-2">Check your email</h2>
+          <h2 className="text-h2 text-darkSlate mb-2">Enter verification code</h2>
           <p className="text-body text-slateGray mb-1">
-            We sent a magic link to
+            We sent a 8-digit code to
           </p>
-          <p className="text-body text-uclaBlue font-medium mb-4">{email}</p>
-          <p className="text-small text-slateGray">
-            Click the link in the email to sign in. It expires in 1 hour.
+          <p className="text-body text-uclaBlue font-medium mb-6">{normalizedEmail}</p>
+
+          <div className="flex justify-center gap-2 mb-4" onPaste={handleOtpPaste}>
+            {otp.map((digit, i) => (
+              <input
+                key={i}
+                ref={inputRefs[i]}
+                type="text"
+                inputMode="numeric"
+                maxLength={1}
+                value={digit}
+                onChange={(e) => handleOtpChange(i, e.target.value)}
+                onKeyDown={(e) => handleOtpKeyDown(i, e)}
+                disabled={verifying}
+                className="w-10 h-12 text-center text-lg font-semibold border-2 border-border rounded-xl focus:border-uclaBlue focus:ring-2 focus:ring-uclaBlue/20 focus:outline-none transition-colors disabled:opacity-50"
+              />
+            ))}
+          </div>
+
+          {error && <p className="text-small text-red-600 mb-3">{error}</p>}
+
+          {verifying && (
+            <div className="flex items-center justify-center gap-2 text-body text-slateGray mb-3">
+              <div className="w-4 h-4 border-2 border-uclaBlue/30 border-t-uclaBlue rounded-full animate-spin" />
+              <span>Verifying...</span>
+            </div>
+          )}
+
+          <p className="text-small text-slateGray mb-4">
+            Didn&apos;t receive the code? Check your spam folder
           </p>
+
+          <button
+            onClick={() => { setSent(false); setEmail(''); setOtp(['', '', '', '', '', '', '', '']); setError(''); }}
+            className="text-small text-uclaBlue font-medium underline"
+          >
+            Use a different email
+          </button>
         </div>
-        <button
-          onClick={() => { setSent(false); setEmail(''); }}
-          className="w-full text-center text-small text-slateGray mt-4 underline"
-        >
-          Use a different email
-        </button>
       </div>
     );
   }
@@ -99,7 +196,7 @@ function LoginForm() {
             <div>
               <p className="text-small text-uclaBlue font-medium mb-1">UCLA Email Verification</p>
               <p className="text-xs text-slateGray">
-                We&apos;ll send a magic link — no password needed
+                We&apos;ll send a 8-digit code — no password needed
               </p>
             </div>
           </div>
@@ -112,7 +209,7 @@ function LoginForm() {
             {isLoading ? (
               <>
                 <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                <span>Sending magic link...</span>
+                <span>Sending code...</span>
               </>
             ) : (
               'Continue with UCLA Email'

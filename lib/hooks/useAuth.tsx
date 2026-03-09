@@ -10,6 +10,7 @@ interface AuthContextValue {
   profile: User | null;
   loading: boolean;
   signInWithEmail: (email: string) => Promise<{ error: string | null }>;
+  verifyOtp: (email: string, token: string) => Promise<{ error: string | null }>;
   signOut: () => Promise<void>;
 }
 
@@ -18,6 +19,7 @@ const AuthContext = createContext<AuthContextValue>({
   profile: null,
   loading: true,
   signInWithEmail: async () => ({ error: null }),
+  verifyOtp: async () => ({ error: null }),
   signOut: async () => {},
 });
 
@@ -79,15 +81,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!normalized.endsWith('@ucla.edu')) {
       return { error: 'Only UCLA email addresses (@ucla.edu or @g.ucla.edu) are allowed.' };
     }
-  
+
     const { error } = await supabase.auth.signInWithOtp({
       email: normalized,
       options: {
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
         shouldCreateUser: true,
       },
     });
   
+    return { error: error?.message ?? null };
+  };
+
+  const verifyOtp = async (email: string, token: string) => {
+    const { error } = await supabase.auth.verifyOtp({
+      email,
+      token,
+      type: 'email',
+    });
     return { error: error?.message ?? null };
   };
 
@@ -98,7 +108,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   return (
-    <AuthContext.Provider value={{ supabaseUser, profile, loading, signInWithEmail, signOut }}>
+    <AuthContext.Provider value={{ supabaseUser, profile, loading, signInWithEmail, verifyOtp, signOut }}>
       {children}
     </AuthContext.Provider>
   );

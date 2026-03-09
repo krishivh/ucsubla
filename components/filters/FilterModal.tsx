@@ -5,6 +5,7 @@ import Icon from '../common/Icon';
 import RangeSlider from './RangeSlider';
 import ToggleSwitch from './ToggleSwitch';
 import ChipGroup from './ChipGroup';
+import { quarterToDates } from '@/lib/quarterDates';
 import { formatPrice, countActiveFilters } from '@/lib/utils';
 import type { FilterState, Quarter, RoomType, BathroomType, RoommatePreference } from '@/lib/types';
 
@@ -179,7 +180,24 @@ export default function FilterModal({
             <ChipGroup
               options={quarterOptions}
               selected={filters.quarters}
-              onChange={(quarters) => setFilters({ ...filters, quarters: quarters as Quarter[] })}
+              onChange={(quarters) => {
+                const typedQuarters = quarters as Quarter[];
+                const newlyAdded = typedQuarters.find(q => !filters.quarters.includes(q));
+                let moveIn = filters.moveInDate;
+                let moveOut = filters.moveOutDate;
+                if (newlyAdded) {
+                  const dates = quarterToDates(newlyAdded);
+                  if (dates) {
+                    moveIn = moveIn || dates.moveIn;
+                    moveOut = dates.moveOut;
+                  }
+                }
+                if (typedQuarters.length === 0) {
+                  moveIn = null;
+                  moveOut = null;
+                }
+                setFilters({ ...filters, quarters: typedQuarters, moveInDate: moveIn, moveOutDate: moveOut });
+              }}
             />
           </div>
 

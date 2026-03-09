@@ -22,6 +22,7 @@ import {
   ChevronRight,
   Pencil,
   Trash2,
+  Link2,
   type LucideIcon,
 } from 'lucide-react';
 
@@ -50,6 +51,7 @@ const iconMap: Record<string, LucideIcon> = {
   'chevron.right': ChevronRight,
   pencil: Pencil,
   trash: Trash2,
+  link: Link2,
 };
 
 export interface IconProps {

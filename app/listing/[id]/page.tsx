@@ -25,6 +25,7 @@ export default function ListingDetailsPage() {
   const [messaging, setMessaging] = useState(false);
   const [msgModal, setMsgModal] = useState(false);
   const [initialMsg, setInitialMsg] = useState('');
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     // Try API first
@@ -110,7 +111,35 @@ export default function ListingDetailsPage() {
             <Icon name="chevron.left" size={24} className="text-darkSlate" />
           </button>
           <div className="flex items-center gap-2">
-            <button className="p-1.5 hover:bg-gray-100 rounded-full transition-colors">
+            <button
+              onClick={async () => {
+                const url = `${window.location.origin}/listing/${listingId}`;
+                await navigator.clipboard.writeText(url);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              }}
+              className="p-1.5 hover:bg-gray-100 rounded-full transition-colors relative"
+            >
+              {copied ? (
+                <span className="text-xs text-uclaBlue font-medium">Copied!</span>
+              ) : (
+                <Icon name="link" size={22} className="text-darkSlate" strokeWidth={1.5} />
+              )}
+            </button>
+            <button
+              onClick={async () => {
+                const url = `${window.location.origin}/listing/${listingId}`;
+                if (navigator.share) {
+                  try {
+                    await navigator.share({ title: listing?.title, text: `Check out this sublease: ${listing?.title}`, url });
+                  } catch {}
+                } else {
+                  await navigator.clipboard.writeText(url);
+                  alert('Link copied to clipboard!');
+                }
+              }}
+              className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+            >
               <Icon name="square.and.arrow.up" size={22} className="text-darkSlate" strokeWidth={1.5} />
             </button>
             <button

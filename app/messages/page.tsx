@@ -15,13 +15,7 @@ export default function MessagesPage() {
   const [messageText, setMessageText] = useState('');
   const { messages, loading: msgsLoading, sendMessage } = useMessages(selectedId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [readConvIds, setReadConvIds] = useState<Set<string>>(() => {
-    if (typeof window === 'undefined') return new Set();
-    try {
-      const saved = localStorage.getItem('bruinlease-read-convs');
-      return saved ? new Set(JSON.parse(saved)) : new Set();
-    } catch { return new Set(); }
-  });
+  const [readConvIds, setReadConvIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });

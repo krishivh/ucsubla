@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react';
 import Icon from '@/components/common/Icon';
+import Link from 'next/link';
 import BottomNav from '@/components/layout/BottomNav';
 import { useConversations, useMessages } from '@/lib/hooks/useMessages';
 import { useAuth } from '@/lib/hooks/useAuth';
@@ -9,15 +10,23 @@ import { getInitials } from '@/lib/utils';
 
 export default function MessagesPage() {
   const { supabaseUser } = useAuth();
-  const { conversations, loading: convsLoading } = useConversations();
+  const { conversations, loading: convsLoading, refetch } = useConversations();
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [messageText, setMessageText] = useState('');
   const { messages, loading: msgsLoading, sendMessage } = useMessages(selectedId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const [readConvIds, setReadConvIds] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages.length]);
+
+  useEffect(() => {
+    if (!selectedId) {
+      const timer = setTimeout(() => refetch(), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [selectedId, refetch]);
 
   const handleSend = async () => {
     if (!messageText.trim()) return;
@@ -50,7 +59,10 @@ export default function MessagesPage() {
               {conversations.map((conv) => (
                 <button
                   key={conv.id}
-                  onClick={() => setSelectedId(conv.id)}
+                  onClick={() => {
+                    setSelectedId(conv.id);
+                    setReadConvIds(prev => new Set(prev).add(conv.id));
+                  }}
                   className="w-full card shadow-card p-4 hover:bg-gray-50 transition-colors text-left"
                 >
                   <div className="flex gap-3">
@@ -74,7 +86,7 @@ export default function MessagesPage() {
                         <p className="text-body text-slateGray truncate">
                           {conv.lastMessage?.text ?? 'No messages yet'}
                         </p>
-                        {conv.unreadCount > 0 && (
+                        {conv.unreadCount > 0 && !readConvIds.has(conv.id) && (
                           <div className="bg-uclaBlue rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
                             <span className="text-white text-xs font-medium">{conv.unreadCount}</span>
                           </div>
@@ -120,9 +132,9 @@ export default function MessagesPage() {
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-h3 text-darkSlate truncate">
+              <Link href={`/listing/${selectedConv?.listing_id}`} className="text-h3 text-darkSlate truncate hover:underline">
                 {selectedConv?.listings?.address ?? 'Listing'}
-              </h2>
+              </Link>
               <div className="flex items-center gap-1">
                 <p className="text-small text-slateGray truncate">
                   {selectedConv?.otherProfile?.name ?? ''}

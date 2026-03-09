@@ -8,6 +8,8 @@ import { useConversations, useMessages } from '@/lib/hooks/useMessages';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { getInitials } from '@/lib/utils';
 
+let globalReadConvIds = new Set<string>();
+
 export default function MessagesPage() {
   const { supabaseUser } = useAuth();
   const { conversations, loading: convsLoading, refetch } = useConversations();
@@ -15,7 +17,7 @@ export default function MessagesPage() {
   const [messageText, setMessageText] = useState('');
   const { messages, loading: msgsLoading, sendMessage } = useMessages(selectedId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [readConvIds, setReadConvIds] = useState<Set<string>>(new Set());
+  const [readConvIds, setReadConvIds] = useState<Set<string>>(globalReadConvIds);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -29,9 +31,7 @@ export default function MessagesPage() {
   }, [selectedId, refetch]);
 
   useEffect(() => {
-    if (readConvIds.size > 0) {
-      localStorage.setItem('bruinlease-read-convs', JSON.stringify([...readConvIds]));
-    }
+    globalReadConvIds = readConvIds;
   }, [readConvIds]);
 
   const handleSend = async () => {

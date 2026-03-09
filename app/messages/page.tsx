@@ -8,7 +8,12 @@ import { useConversations, useMessages } from '@/lib/hooks/useMessages';
 import { useAuth } from '@/lib/hooks/useAuth';
 import { getInitials } from '@/lib/utils';
 
-let globalReadConvIds = new Set<string>();
+const readTimestamps: Record<string, string> = (() => {
+  if (typeof window === 'undefined') return {};
+  try {
+    return JSON.parse(localStorage.getItem('bruinlease-read-ts') || '{}');
+  } catch { return {}; }
+})();
 
 export default function MessagesPage() {
   const { supabaseUser } = useAuth();
@@ -17,7 +22,6 @@ export default function MessagesPage() {
   const [messageText, setMessageText] = useState('');
   const { messages, loading: msgsLoading, sendMessage } = useMessages(selectedId);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const [readConvIds, setReadConvIds] = useState<Set<string>>(globalReadConvIds);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -25,19 +29,35 @@ export default function MessagesPage() {
 
   useEffect(() => {
     if (!selectedId) {
-      const timer = setTimeout(() => refetch(), 500);
-      return () => clearTimeout(timer);
+      refetch();
     }
   }, [selectedId, refetch]);
 
   useEffect(() => {
-    globalReadConvIds = readConvIds;
-  }, [readConvIds]);
+    if (selectedId) {
+      readTimestamps[selectedId] = new Date().toISOString();
+      localStorage.setItem('bruinlease-read-ts', JSON.stringify(readTimestamps));
+    }
+  }, [selectedId]);
+  
 
   const handleSend = async () => {
     if (!messageText.trim()) return;
     await sendMessage(messageText);
     setMessageText('');
+  };
+
+  const handleBack = () => {
+    if (selectedId && messages.length > 0) {
+      const lastMsg = messages[messages.length - 1];
+      conversations.forEach(c => {
+        if (c.id === selectedId && c.lastMessage) {
+          c.lastMessage.text = lastMsg.text;
+          c.lastMessage.created_at = lastMsg.timestamp;
+        }
+      });
+    }
+    setSelectedId(null);
   };
 
   const selectedConv = conversations.find(c => c.id === selectedId);
@@ -65,10 +85,7 @@ export default function MessagesPage() {
               {conversations.map((conv) => (
                 <button
                   key={conv.id}
-                  onClick={() => {
-                    setSelectedId(conv.id);
-                    setReadConvIds(prev => new Set(prev).add(conv.id));
-                  }}
+                  onClick={() => setSelectedId(conv.id)}
                   className="w-full card shadow-card p-4 hover:bg-gray-50 transition-colors text-left"
                 >
                   <div className="flex gap-3">
@@ -92,10 +109,8 @@ export default function MessagesPage() {
                         <p className="text-body text-slateGray truncate">
                           {conv.lastMessage?.text ?? 'No messages yet'}
                         </p>
-                        {conv.unreadCount > 0 && !readConvIds.has(conv.id) && (
-                          <div className="bg-uclaBlue rounded-full w-5 h-5 flex items-center justify-center flex-shrink-0">
-                            <span className="text-white text-xs font-medium">{conv.unreadCount}</span>
-                          </div>
+                        {conv.lastMessage && (!readTimestamps[conv.id] || conv.lastMessage.created_at > readTimestamps[conv.id]) && (
+                          <div className="bg-uclaBlue rounded-full w-3 h-3 flex-shrink-0" />
                         )}
                       </div>
                     </div>
@@ -126,7 +141,7 @@ export default function MessagesPage() {
       <div className="blurHeaderWithNav app-container">
         <div className="blurHeaderWithNavContent">
           <button
-            onClick={() => setSelectedId(null)}
+            onClick={handleBack}
             className="p-1.5 hover:bg-gray-100 rounded-full transition-colors -ml-1.5"
           >
             <Icon name="chevron.left" size={24} className="text-darkSlate" />
@@ -163,7 +178,7 @@ export default function MessagesPage() {
           </div>
         ) : (
           messages.map((message) => {
-            const isMine = message.senderId === supabaseUser?.id;
+            const isMine = message.senderId === supabaseUser?.id || message.senderId === 'me';
             return (
               <div key={message.id} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[75%] rounded-2xl px-4 py-2.5 ${isMine ? 'bg-uclaBlue text-white' : 'bg-gray-200 text-darkSlate'}`}>

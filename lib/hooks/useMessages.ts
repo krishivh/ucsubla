@@ -40,7 +40,7 @@ export function useConversations() {
 
   const fetchConversations = useCallback(async () => {
     try {
-      const res = await fetch('/api/conversations');
+      const res = await fetch(`/api/conversations?t=${Date.now()}`);
       if (!res.ok) throw new Error('Failed to load conversations');
       const { conversations: data } = await res.json();
 

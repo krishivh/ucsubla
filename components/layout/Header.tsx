@@ -30,7 +30,7 @@ export default function Header({ onFilterClick, onSearchChange, hideSearch = fal
           <div className="bg-uclaBlue rounded-lg p-1.5">
             <Icon name="graduationcap.fill" size={20} className="text-white" />
           </div>
-          <h1 className="text-h1 text-uclaBlue">UCSubLA</h1>
+          <h1 className="text-h1 text-uclaBlue">BruinLease</h1>
         </Link>
 
         <Link

@@ -46,7 +46,7 @@ export default function LoginPage() {
           <Icon name="graduationcap.fill" size={48} className="text-white" />
         </div>
         <h1 className="text-[32px] leading-10 font-medium text-uclaBlue mb-2">
-          UCSubLA
+          BruinLease
         </h1>
         <p className="text-body text-slateGray">
           Find your perfect sublease near UCLA

@@ -1,5 +1,5 @@
 -- ============================================================
--- UCSubLA — Supabase Schema
+-- BruinLease — Supabase Schema
 -- Run this in your Supabase SQL Editor (Dashboard → SQL Editor)
 -- ============================================================
 

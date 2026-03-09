@@ -2,7 +2,7 @@
 
 **Date**: February 14, 2026
 **Reviewer**: Comprehensive code review
-**App**: UCSubLA - UCLA Student Subleasing Platform
+**App**: BruinLease - UCLA Student Subleasing Platform
 
 ---
 

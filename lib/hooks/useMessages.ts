@@ -87,7 +87,14 @@ export function useMessages(conversationId: string | null) {
       const res = await fetch(`/api/conversations/${conversationId}/messages`);
       if (res.ok) {
         const { messages: data } = await res.json();
-        setMessages(data ?? []);
+        setMessages((data ?? []).map((m: any) => ({
+          id: m.id,
+          conversationId: m.conversation_id,
+          senderId: m.sender_id,
+          text: m.text,
+          timestamp: m.created_at,
+          read: m.read,
+        })));
       }
     } catch {
       // swallow polling errors

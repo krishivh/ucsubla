@@ -134,7 +134,7 @@ export default function LoginPage() {
         <div className="bg-uclaBlue rounded-2xl p-4 inline-block mb-4">
           <Icon name="graduationcap.fill" size={48} className="text-white" />
         </div>
-        <h1 className="text-[32px] leading-10 font-medium text-uclaBlue mb-2">UCSubLA</h1>
+        <h1 className="text-[32px] leading-10 font-medium text-uclaBlue mb-2">BruinLease</h1>
         <p className="text-body text-slateGray">Find your perfect sublease near UCLA</p>
       </div>
       <Suspense fallback={<div className="w-full max-w-md card p-6 animate-pulse h-48" />}>

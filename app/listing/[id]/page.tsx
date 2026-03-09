@@ -189,28 +189,29 @@ export default function ListingDetailsPage() {
         )}
       </div>
 
-      {/* Message Button */}
-      <div className="fixed bottom-20 left-0 right-0 px-6 py-4 app-container">
-        <button
-          onClick={() => supabaseUser ? setMsgModal(true) : router.push('/login')}
-          className="w-full btn-primary shadow-elevated flex items-center justify-center gap-2"
-        >
-          <Icon name="message" size={18} className="text-white" />
-          <span>Message</span>
-        </button>
-      </div>
+      {/* Message Button — hide if this is the user's own listing */}
+      {(!supabaseUser || supabaseUser.id !== listing.listerId) && (
+        <div className="fixed bottom-20 left-0 right-0 px-6 py-4 app-container">
+          <button
+            onClick={() => supabaseUser ? setMsgModal(true) : router.push('/login')}
+            className="w-full btn-primary shadow-elevated flex items-center justify-center gap-2"
+          >
+            <Icon name="message" size={18} className="text-white" />
+            <span>Message</span>
+          </button>
+        </div>
+      )}
 
       {/* Message Modal */}
       {msgModal && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm" onClick={() => setMsgModal(false)}>
-          <div className="w-full max-w-[430px] bg-white rounded-t-2xl p-6 space-y-4" onClick={e => e.stopPropagation()}>
-            <h2 className="text-h2 text-darkSlate font-semibold">Send a message</h2>
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm" onClick={() => setMsgModal(false)}>
+            <div className="w-full max-w-[430px] bg-white rounded-2xl p-6 pb-8 mx-4 space-y-4" style={{ marginBottom: 'env(safe-area-inset-bottom)' }} onClick={e => e.stopPropagation()}>
             <p className="text-small text-slateGray">About: {listing.title}</p>
             <textarea
               value={initialMsg}
               onChange={e => setInitialMsg(e.target.value)}
               placeholder="Hi, I'm interested in this sublease! Is it still available?"
-              rows={4}
+              rows={3}
               className="w-full bg-gray-50 border border-border rounded-xl px-4 py-3 text-body text-darkSlate placeholder:text-lightSlate focus:outline-none focus:ring-2 focus:ring-uclaBlue resize-none"
               autoFocus
             />

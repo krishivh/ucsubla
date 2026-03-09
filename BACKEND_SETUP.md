@@ -1,4 +1,4 @@
-# UCSubLA — Backend Setup Guide
+# BruinLease — Backend Setup Guide
 
 ## What's been added
 

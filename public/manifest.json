@@ -1,6 +1,6 @@
 {
-  "name": "UCSubLA - UCLA Subleasing",
-  "short_name": "UCSubLA",
+  "name": "BruinLease - UCLA Subleasing",
+  "short_name": "BruinLease",
   "description": "Find and list sublease opportunities near UCLA campus",
   "start_url": "/",
   "display": "standalone",

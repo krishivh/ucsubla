@@ -16,22 +16,25 @@ export default function ReviewCard({ review }: ReviewCardProps) {
     ? review.text
     : `${review.text.substring(0, maxLength)}...`;
 
-  const sourceIcon = review.source === 'reddit' ? 'r' : 'B';
-  const sourceColor = review.source === 'reddit' ? 'bg-orange-500' : 'bg-blue-500';
-  const sourceLabel = review.source === 'reddit' ? 'Reddit' : 'Bruinwalk';
-
+    const sourceLabel = review.source === 'reddit' ? 'Reddit' : review.source === 'yelp' ? 'Yelp' : 'Bruinwalk';
   return (
     <div className="card shadow-minimal p-4">
       {/* Source header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          <div className={`${sourceColor} w-6 h-6 rounded-full flex items-center justify-center`}>
-            <span className="text-white text-xs font-bold">{sourceIcon}</span>
-          </div>
+        {review.source === 'reddit' ? (
+            <img src="https://www.redditstatic.com/desktop2x/img/favicon/android-icon-192x192.png" alt="Reddit" className="w-6 h-6 rounded-full" />
+          ) : review.source === 'yelp' ? (
+            <img src="https://www.yelp.com/favicon.ico" alt="Yelp" className="w-6 h-6" />
+          ) : (
+            <div className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
+              <span className="text-white text-xs font-bold">B</span>
+            </div>
+          )}
           <div className="flex flex-col">
             <span className="text-small text-darkSlate font-medium">
-              {review.sourceName}
-            </span>
+                {sourceLabel}
+              </span>
             <a
               href={review.sourceUrl}
               target="_blank"

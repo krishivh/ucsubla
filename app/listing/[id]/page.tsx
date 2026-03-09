@@ -12,6 +12,7 @@ import { useBookmarks } from '@/lib/hooks/useBookmarks';
 import { useAuth } from '@/lib/hooks/useAuth';
 import type { Listing } from '@/lib/types';
 
+
 export default function ListingDetailsPage() {
   const params = useParams();
   const router = useRouter();
@@ -45,7 +46,11 @@ export default function ListingDetailsPage() {
       .finally(() => setLoading(false));
   }, [listingId]);
 
-  const reviews = mockReviews.filter(r => r.listingId === listingId);
+  const reviews = mockReviews.filter(r => 
+    r.listingId === listingId || 
+    ((r as any).address && listing && listing.address.toLowerCase().includes((r as any).address.toLowerCase()))
+  );
+  console.log('reviews found:', reviews.length, 'listing address:', listing?.address);
   const isBookmarked = bookmarkedIds.includes(listingId);
 
   const handleMessage = async () => {

@@ -3,7 +3,7 @@ export type BathroomType = 'private' | 'shared';
 export type Quarter = 'fall' | 'winter' | 'spring' | 'summer';
 export type RoommatePreference = 'male' | 'female' | 'coed';
 export type ParkingType = 'covered' | 'garage' | 'street';
-export type ReviewSource = 'reddit' | 'bruinwalk';
+export type ReviewSource = 'reddit' | 'bruinwalk' | 'yelp';
 
 export interface Amenities {
   furnished: boolean;
@@ -46,6 +46,7 @@ export interface Listing {
 export interface Review {
   id: string;
   listingId: string;
+  address?: string;
   source: ReviewSource;
   sourceUrl: string;
   sourceName: string; // e.g. "r/ucla" or "Bruinwalk Apartments"

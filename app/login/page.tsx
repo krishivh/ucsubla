@@ -110,11 +110,12 @@ function LoginForm() {
           </div>
           <h2 className="text-h2 text-darkSlate mb-2">Enter verification code</h2>
           <p className="text-body text-slateGray mb-1">
-            We sent a 8-digit code to
+            We sent an 8-digit code to
           </p>
           <p className="text-body text-uclaBlue font-medium mb-6">{normalizedEmail}</p>
 
-          <div className="flex justify-center gap-2 mb-4" onPaste={handleOtpPaste}>
+          {/* OTP Input */}
+          <div className="flex justify-center gap-1.5 mb-4 px-2" onPaste={handleOtpPaste}>
             {otp.map((digit, i) => (
               <input
                 key={i}
@@ -126,7 +127,7 @@ function LoginForm() {
                 onChange={(e) => handleOtpChange(i, e.target.value)}
                 onKeyDown={(e) => handleOtpKeyDown(i, e)}
                 disabled={verifying}
-                className="w-10 h-12 text-center text-lg font-semibold border-2 border-border rounded-xl focus:border-uclaBlue focus:ring-2 focus:ring-uclaBlue/20 focus:outline-none transition-colors disabled:opacity-50"
+                className="w-9 h-11 text-center text-base font-semibold border-2 border-border rounded-lg focus:border-uclaBlue focus:ring-2 focus:ring-uclaBlue/20 focus:outline-none transition-colors disabled:opacity-50"
               />
             ))}
           </div>
@@ -139,6 +140,14 @@ function LoginForm() {
               <span>Verifying...</span>
             </div>
           )}
+
+          <button
+            onClick={() => handleVerify(otp.join(''))}
+            disabled={otp.some(d => d === '') || verifying}
+            className="w-full btn-primary py-3 rounded-xl text-body font-medium disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+          >
+            Verify Code
+          </button>
 
           <p className="text-small text-slateGray mb-4">
             Didn&apos;t receive the code? Check your spam folder
@@ -196,7 +205,7 @@ function LoginForm() {
             <div>
               <p className="text-small text-uclaBlue font-medium mb-1">UCLA Email Verification</p>
               <p className="text-xs text-slateGray">
-                We&apos;ll send a 8-digit code — no password needed
+                We&apos;ll send an 8-digit code — no password needed
               </p>
             </div>
           </div>
